@@ -61,6 +61,7 @@ class XMLSecurityDSig
     const C14N_COMMENTS = 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments';
     const EXC_C14N = 'http://www.w3.org/2001/10/xml-exc-c14n#';
     const EXC_C14N_COMMENTS = 'http://www.w3.org/2001/10/xml-exc-c14n#WithComments';
+    const GOST_3411 = 'http://www.w3.org/2001/04/xmldsig-more#gostr3411';
 
     const template = '<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo>
@@ -341,6 +342,9 @@ class XMLSecurityDSig
             case self::RIPEMD160:
                 $alg = 'ripemd160';
                 break;
+            case self::GOST_3411:
+                $alg = 'gost';
+                break;
             default:
                 throw new Exception("Cannot validate digest: Unsupported Algorithm <$digestAlgorithm>");
         }
@@ -386,6 +390,7 @@ class XMLSecurityDSig
         $canonicalMethod = 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315';
         $arXPath = null;
         $prefixList = null;
+
         foreach ($nodelist AS $transform) {
             $algorithm = $transform->getAttribute("Algorithm");
             switch ($algorithm) {
