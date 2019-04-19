@@ -58,6 +58,7 @@ class XMLSecurityKey
     const RSA_SHA384 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384';
     const RSA_SHA512 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512';
     const HMAC_SHA1 = 'http://www.w3.org/2000/09/xmldsig#hmac-sha1';
+    const GOST_3410 = 'http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411';
 
     /** @var array */
     private $cryptParams = array();
@@ -216,6 +217,17 @@ class XMLSecurityKey
                 $this->cryptParams['library'] = $type;
                 $this->cryptParams['method'] = 'http://www.w3.org/2000/09/xmldsig#hmac-sha1';
                 break;
+            case(self::GOST_3410):
+                $this->cryptParams['library'] = 'openssl';
+                $this->cryptParams['method'] = 'http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411';
+                $this->cryptParams['digest'] = 'GOST R 34.11-94';
+                if (is_array($params) && ! empty($params['type'])) {
+                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                        $this->cryptParams['type'] = $params['type'];
+                        break;
+                    }
+                }
+                throw new Exception('Certificate "type" (private/public) must be passed via parameters');
             default:
                 throw new Exception('Invalid Key Type');
         }
@@ -250,9 +262,9 @@ class XMLSecurityKey
             throw new Exception('Unknown key size for type "' . $this->type . '".');
         }
         $keysize = $this->cryptParams['keysize'];
-        
+
         $key = openssl_random_pseudo_bytes($keysize);
-        
+
         if ($this->type === self::TRIPLEDES_CBC) {
             /* Make sure that the generated key has the proper parity bits set.
              * Mcrypt doesn't care about the parity bits, but others may care.
@@ -267,7 +279,7 @@ class XMLSecurityKey
                 $key[$i] = chr($byte);
             }
         }
-        
+
         $this->key = $key;
         return $key;
     }
@@ -342,7 +354,7 @@ class XMLSecurityKey
 	                break;
 
 	            case 'private':
-                    $this->key = openssl_get_privatekey($this->key, $this->passphrase);
+                    //$this->key = openssl_get_privatekey($this->key, $this->passphrase);
                     break;
 
                 case'symmetric':
