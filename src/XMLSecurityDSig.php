@@ -343,7 +343,7 @@ class XMLSecurityDSig
                 $alg = 'ripemd160';
                 break;
             case self::GOST_3411:
-                $alg = 'gost';
+                $alg = 'gost-crypto';
                 break;
             default:
                 throw new Exception("Cannot validate digest: Unsupported Algorithm <$digestAlgorithm>");
